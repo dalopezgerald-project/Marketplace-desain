@@ -10,4 +10,8 @@ protected $fillable = [
  'designer_id','category_id','title','description','price','status'
 ];
 
+public function designer(){
+    return $this->belongsTo(User::class,'designer_id');
+}
+
 }
