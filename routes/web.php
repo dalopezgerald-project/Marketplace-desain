@@ -20,5 +20,17 @@ Route::middleware(['auth','role:admin'])->group(function(){
     Route::post('/admin/service/{id}/reject',[AdminController::class,'reject']);
 });
 
+// USER
+Route::middleware(['auth','role:user'])->group(function(){
+    Route::get('/services',[UserController::class,'index']);
+    Route::post('/order/{id}',[OrderController::class,'store']);
+});
+
+// DESAINER
+Route::middleware(['auth','role:desainer'])->group(function(){
+    Route::get('/desainer/orders',[OrderController::class,'desainerOrders']);
+    Route::post('/order/{id}/{status}',[OrderController::class,'updateStatus']);
+});
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
