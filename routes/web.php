@@ -1,12 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 Auth::routes();
+
+Route::middleware(['auth','role:user'])->group(function(){
+    Route::get('/services',[UserController::class,'index']);
+});
 
 Route::middleware(['auth','role:desainer'])->group(function(){
     Route::get('/desainer/service',[ServiceController::class,'index']);
