@@ -2,36 +2,54 @@
 
 @section('content')
 
-<h4>Persetujuan Jasa Desain</h4>
+<h4 class="mb-4 fw-bold animate__animated animate__fadeIn">
+    Dashboard Admin – Persetujuan Jasa
+</h4>
 
-<table class="table table-bordered">
-    <tr class="table-dark">
-        <th>Judul</th>
-        <th>Desainer</th>
-        <th>Aksi</th>
-    </tr>
+<div class="card shadow animate__animated animate__fadeInUp">
+<div class="card-body">
 
-    @forelse($services as $s)
-    <tr>
-        <td>{{ $s->title }}</td>
-        <td>{{ $s->designer->name ?? '-' }}</td>
-        <td class="d-flex gap-2">
-            <form method="POST" action="/admin/service/{{ $s->id }}/approve">
-                @csrf
-                <button class="btn btn-success btn-sm">Approve</button>
-            </form>
+<table class="table table-bordered align-middle">
+<thead class="table-dark">
+<tr>
+    <th>Judul Jasa</th>
+    <th>Desainer</th>
+    <th>Status</th>
+    <th>Aksi</th>
+</tr>
+</thead>
 
-            <form method="POST" action="/admin/service/{{ $s->id }}/reject">
-                @csrf
-                <button class="btn btn-danger btn-sm">Reject</button>
-            </form>
-        </td>
-    </tr>
-    @empty
-    <tr>
-        <td colspan="3" class="text-center">Tidak ada jasa pending</td>
-    </tr>
-    @endforelse
+<tbody>
+@forelse($services as $s)
+<tr>
+    <td>{{ $s->title }}</td>
+    <td>{{ $s->designer->name ?? '-' }}</td>
+    <td>
+        <span class="badge bg-warning">Pending</span>
+    </td>
+    <td>
+        <form method="POST" action="/admin/service/{{ $s->id }}/approve" class="d-inline">
+            @csrf
+            <button class="btn btn-success btn-sm">Approve</button>
+        </form>
+
+        <form method="POST" action="/admin/service/{{ $s->id }}/reject" class="d-inline">
+            @csrf
+            <button class="btn btn-danger btn-sm">Reject</button>
+        </form>
+    </td>
+</tr>
+@empty
+<tr>
+    <td colspan="4" class="text-center text-muted">
+        Tidak ada jasa menunggu persetujuan
+    </td>
+</tr>
+@endforelse
+</tbody>
 </table>
+
+</div>
+</div>
 
 @endsection

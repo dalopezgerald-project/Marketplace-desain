@@ -2,38 +2,38 @@
 
 @section('content')
 
-<h4>Jasa Desain Saya</h4>
+<h4 class="mb-4 fw-bold animate__animated animate__fadeIn">
+    Dashboard Desainer
+</h4>
 
-<a href="/desainer/service/create" class="btn btn-primary mb-3">
-    + Tambah Jasa
+<a href="/desainer/service/create" 
+   class="btn btn-primary mb-4 animate__animated animate__fadeInUp">
+   + Tambah Jasa
 </a>
 
-<table class="table table-bordered">
-    <tr class="table-dark">
-        <th>Judul</th>
-        <th>Harga</th>
-        <th>Status</th>
-    </tr>
+<div class="row">
+@forelse($services as $s)
+<div class="col-md-4">
+    <div class="card mb-4 animate__animated animate__fadeInUp">
+        <div class="card-body">
+            <h5 class="fw-bold">{{ $s->title }}</h5>
+            <p class="text-muted">{{ Str::limit($s->description, 80) }}</p>
 
-    @forelse($services as $s)
-    <tr>
-        <td>{{ $s->title }}</td>
-        <td>Rp {{ number_format($s->price) }}</td>
-        <td>
-            @if($s->status == 'pending')
-                <span class="badge bg-warning">Pending</span>
-            @elseif($s->status == 'approved')
-                <span class="badge bg-success">Approved</span>
-            @else
-                <span class="badge bg-danger">Rejected</span>
-            @endif
-        </td>
-    </tr>
-    @empty
-    <tr>
-        <td colspan="3" class="text-center">Belum ada jasa</td>
-    </tr>
-    @endforelse
-</table>
+            <p>
+                <strong>Rp {{ number_format($s->price) }}</strong>
+            </p>
+
+            <span class="badge 
+                {{ $s->status == 'approved' ? 'bg-success' : 
+                   ($s->status == 'pending' ? 'bg-warning' : 'bg-danger') }}">
+                {{ ucfirst($s->status) }}
+            </span>
+        </div>
+    </div>
+</div>
+@empty
+<p class="text-muted">Belum ada jasa.</p>
+@endforelse
+</div>
 
 @endsection
