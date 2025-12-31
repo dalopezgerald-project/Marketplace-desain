@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +26,10 @@ Route::middleware(['auth','role:admin'])->group(function(){
     Route::post('/admin/service/{id}/reject',[AdminController::class,'reject']);
 });
 
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');
+    
 // USER
 Route::middleware(['auth','role:user'])->group(function(){
     Route::get('/services',[UserController::class,'index']);
