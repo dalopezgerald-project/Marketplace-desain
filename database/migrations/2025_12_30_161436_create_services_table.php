@@ -10,18 +10,17 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('services', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('designer_id')->constrained('users');
-            $table->foreignId('category_id')->constrained();
-            $table->string('title');
-            $table->text('description');
-            $table->integer('price');
-            $table->enum('status',['pending','approved','rejected'])->default('pending');
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('services', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('designer_id')->constrained('users')->onDelete('cascade');
+        $table->string('title');
+        $table->text('description');
+        $table->integer('price');
+        $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

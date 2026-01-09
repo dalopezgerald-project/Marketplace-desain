@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -44,5 +45,40 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function services()
+    {
+        return $this->hasMany(Service::class, 'designer_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isDesigner()
+    {
+        return $this->role === 'desainer';
+    }
+
+    public function isUser()
+    {
+        return $this->role === 'user';
+    }
+
+    public function getRoleBadgeAttribute()
+    {
+        return match($this->role) {
+            'admin' => '<span class="badge bg-danger">Admin</span>',
+            'desainer' => '<span class="badge bg-primary">Desainer</span>',
+            'user' => '<span class="badge bg-success">User</span>',
+            default => '<span class="badge bg-secondary">Unknown</span>'
+        };
     }
 }

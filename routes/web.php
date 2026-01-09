@@ -1,8 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Desainer\ServiceController;
+use App\Http\Controllers\Desainer\OrderController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\Payment\PaymentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -10,37 +15,198 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::middleware(['auth','role:user'])->group(function(){
-    Route::get('/services',[UserController::class,'index']);
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD (SMART)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->get('/dashboard', function () {
+    $role = auth()->user()->role;
+
+    if ($role === 'admin') {
+        return redirect('/admin/dashboard');
+    }
+
+    if ($role === 'desainer') {
+        return redirect('/desainer/services');
+    }
+
+    return redirect('/services');
 });
 
-Route::middleware(['auth','role:desainer'])->group(function(){
-    Route::get('/desainer/service',[ServiceController::class,'index']);
-    Route::get('/desainer/service/create',[ServiceController::class,'create']);
-    Route::post('/desainer/service',[ServiceController::class,'store']);
+/*
+|--------------------------------------------------------------------------
+| USER
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::get('/services', [UserController::class, 'index'])
+        ->name('user.services');
+
+    Route::get('/service/{id}', [UserController::class, 'showService'])
+        ->name('user.service-detail');
+
+    Route::post('/service/{id}/order', [UserController::class, 'placeOrder'])
+        ->name('user.place-order');
+
+    Route::get('/order-history', [UserController::class, 'orderHistory'])
+        ->name('user.order-history');
+
+    Route::post('/order/{id}/cancel', [UserController::class, 'cancelOrder'])
+        ->name('user.order.cancel');
+
+    Route::delete('/order/{id}', [UserController::class, 'deleteOrder'])
+        ->name('user.order.delete');
+
+    Route::post('/order/{id}', [OrderController::class, 'store'])
+        ->name('user.orders.store');
 });
 
-Route::middleware(['auth','role:admin'])->group(function(){
-    Route::get('/admin/dashboard',[AdminController::class,'dashboard']);
-    Route::post('/admin/service/{id}/approve',[AdminController::class,'approve']);
-    Route::post('/admin/service/{id}/reject',[AdminController::class,'reject']);
+/*
+|--------------------------------------------------------------------------
+| DESAINER
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/desainer/dashboard', function () {
+        return view('desainer.dashboard');
+    })->name('desainer.dashboard');
+    Route::get('/desainer/services', [ServiceController::class, 'index'])
+        ->name('desainer.services.index');
+
+    Route::get('/desainer/services/create', [ServiceController::class, 'create'])
+        ->name('desainer.services.create');
+
+    Route::post('/desainer/services', [ServiceController::class, 'store'])
+        ->name('desainer.services.store');
+
+    Route::get('/desainer/services/{id}/edit', [ServiceController::class, 'edit'])
+        ->name('desainer.services.edit');
+
+    Route::put('/desainer/services/{id}', [ServiceController::class, 'update'])
+        ->name('desainer.services.update');
+
+    Route::delete('/desainer/services/{id}', [ServiceController::class, 'destroy'])
+        ->name('desainer.services.destroy');
+
+    Route::get('/desainer/orders', [OrderController::class, 'desainerOrders'])
+        ->name('desainer.orders.index');
+
+    Route::post('/order/{id}/status/{status}', [OrderController::class, 'updateStatus'])
+        ->name('desainer.order.update-status');
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth'])
-    ->name('dashboard');
-    
-// USER
-Route::middleware(['auth','role:user'])->group(function(){
-    Route::get('/services',[UserController::class,'index']);
-    Route::post('/order/{id}',[OrderController::class,'store']);
+/*
+|--------------------------------------------------------------------------
+| ADMIN
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
+        ->name('admin.dashboard');
+
+    // Service Management
+    Route::get('/admin/services', [AdminController::class, 'services'])
+        ->name('admin.services');
+
+    Route::get('/admin/services/create', [AdminController::class, 'createService'])
+        ->name('admin.services.create');
+
+    Route::post('/admin/services', [AdminController::class, 'storeService'])
+        ->name('admin.services.store');
+
+    Route::get('/admin/services/{id}/edit', [AdminController::class, 'editService'])
+        ->name('admin.services.edit');
+
+    Route::put('/admin/services/{id}', [AdminController::class, 'updateService'])
+        ->name('admin.services.update');
+
+    Route::delete('/admin/services/{id}', [AdminController::class, 'destroy'])
+        ->name('admin.services.destroy');
+
+    Route::post('/admin/service/{id}/approve', [AdminController::class, 'approve'])
+        ->name('admin.services.approve');
+
+    Route::post('/admin/service/{id}/reject', [AdminController::class, 'reject'])
+        ->name('admin.services.reject');
+
+    // Service Update Approval
+    Route::post('/admin/service/{id}/approve-update', [AdminController::class, 'approveServiceUpdate'])
+        ->name('admin.services.approve-update');
+
+    Route::post('/admin/service/{id}/reject-update', [AdminController::class, 'rejectServiceUpdate'])
+        ->name('admin.services.reject-update');
+
+    // User Management
+    Route::get('/admin/users', [AdminController::class, 'users'])
+        ->name('admin.users');
+
+    Route::get('/admin/users/create', [AdminController::class, 'createUser'])
+        ->name('admin.users.create');
+
+    Route::post('/admin/users', [AdminController::class, 'storeUser'])
+        ->name('admin.users.store');
+
+    Route::get('/admin/users/{id}/edit', [AdminController::class, 'editUser'])
+        ->name('admin.users.edit');
+
+    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])
+        ->name('admin.users.update');
+
+    Route::delete('/admin/users/{id}', [AdminController::class, 'destroyUser'])
+        ->name('admin.users.destroy');
+
+    // Order Management
+    Route::get('/admin/orders', [AdminController::class, 'orders'])
+        ->name('admin.orders');
 });
 
-// DESAINER
-Route::middleware(['auth','role:desainer'])->group(function(){
-    Route::get('/desainer/orders',[OrderController::class,'desainerOrders']);
-    Route::post('/order/{id}/{status}',[OrderController::class,'updateStatus']);
+/*
+|--------------------------------------------------------------------------
+| MESSAGES & NOTIFICATIONS
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/messages', [MessageController::class, 'index'])
+        ->name('messages.index');
+
+    Route::post('/messages', [MessageController::class, 'store'])
+        ->name('messages.store');
+
+    Route::get('/messages/{userId}', [MessageController::class, 'conversation'])
+        ->name('messages.conversation');
+
+    Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead'])
+        ->name('messages.mark-read');
+
+    Route::get('/messages/unread/count', [MessageController::class, 'getUnreadCount'])
+        ->name('messages.unread-count');
 });
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+/*
+|--------------------------------------------------------------------------
+| PAYMENT (API Integration)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/payment/checkout/{order}', [PaymentController::class, 'checkout'])
+        ->name('payment.checkout');
 
+    Route::post('/payment/process/{order}', [PaymentController::class, 'process'])
+        ->name('payment.process');
+
+    Route::post('/payment/verify', [PaymentController::class, 'verify'])
+        ->name('payment.verify');
+});
+
+/*
+|--------------------------------------------------------------------------
+| LOGOUT
+|--------------------------------------------------------------------------
+*/
+Route::post('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/login');
+})->name('logout');

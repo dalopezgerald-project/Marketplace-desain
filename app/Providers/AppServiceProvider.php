@@ -21,4 +21,11 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
+
+    /**
+     * Register middleware aliases.
+     */
+    protected $middlewareAliases = [
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
+    ];
 }
