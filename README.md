@@ -1,4 +1,4 @@
-# Marketplace Jasa Desain Grafis - DesignHub
+# Marketplace Jasa Desain Grafis 
 
 Proyek Laravel untuk marketplace jasa desain grafis dengan sistem role-based (Admin, Desainer, User).
 
