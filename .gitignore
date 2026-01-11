@@ -22,3 +22,21 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Documentation files (not needed for deployment)
+CHANGELOG_UPDATES.md
+CHANGELOG.md
+FIXES_BATCH2.md
+FIXES_SUMMARY.md
+PROJECT_STATUS.md
+QUICK_START.md
+REQUIREMENTS_COMPLIANCE.md
+STEP_BY_STEP_TESTING.md
+TECHNICAL_DOCUMENTATION.md
+TESTING_GUIDE.md
+TODO.md
+USER_FIXES.md
+setup.bat
+marketplace-desain.zip
+public/public.zip
+routes/web.php.backup
